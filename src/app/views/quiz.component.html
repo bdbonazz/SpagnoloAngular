@@ -1,0 +1,74 @@
+<div class="quiz-container" *ngIf="currentVocabolo; else noData">
+  <div class="card">
+    <span class="badge">{{ currentVocabolo.tipo | uppercase }}</span>
+    <ng-container *ngIf="tipoQuiz === 'EsToIt'">
+      <h2>Come si dice in Italiano?</h2>
+      <h1 class="term">{{ currentVocabolo.spagnolo }}</h1>
+
+      <div class="input-section">
+        <input type="text" [(ngModel)]="userItaliano" [disabled]="isSubmitted"
+          placeholder="Scrivi la traduzione in italiano" (keyup.enter)="checkAnswer()">
+      </div>
+    </ng-container>
+    <ng-container *ngIf="tipoQuiz === 'ItToEs'">
+      <h2>Come si dice in Spagnolo?</h2>
+      <h1 class="term">{{ currentVocabolo.italiano }}</h1>
+
+      <div class="input-section">
+        <input type="text" [(ngModel)]="userSpagnolo" [disabled]="isSubmitted"
+          placeholder="Scrivi la traduzione in spagnolo" (keyup.enter)="checkAnswer()">
+      </div>
+    </ng-container>
+
+    <div *ngIf="currentVocabolo.tipo === 'verbo'" class="input-section">
+      <p>Coniuga il verbo al presente:</p>
+      <div class="conjugation-grid">
+        <div class="input-group"><span>Yo</span><input [(ngModel)]="userConjugation.yo" [disabled]="isSubmitted"></div>
+        <div class="input-group"><span>Tú</span><input [(ngModel)]="userConjugation.tu" [disabled]="isSubmitted"></div>
+        <div class="input-group"><span>Él</span><input [(ngModel)]="userConjugation.el" [disabled]="isSubmitted"></div>
+        <div class="input-group"><span>Nos.</span><input [(ngModel)]="userConjugation.nosotros"
+            [disabled]="isSubmitted"></div>
+        <div class="input-group"><span>Vos.</span><input [(ngModel)]="userConjugation.vosotros"
+            [disabled]="isSubmitted"></div>
+        <div class="input-group"><span>Ellos</span><input [(ngModel)]="userConjugation.ellos" [disabled]="isSubmitted">
+        </div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button *ngIf="!isSubmitted" (click)="checkAnswer()" class="btn-check">Verifica</button>
+      <button *ngIf="isSubmitted" (click)="loadNext()" class="btn-next">Prossima Domanda</button>
+    </div>
+
+    <div *ngIf="isSubmitted" class="result-box" [ngClass]="isCorrect ? 'success' : 'error'">
+      <p *ngIf="isCorrect"><strong>¡Muy bien!</strong> La risposta è corretta.</p>
+      <div *ngIf="!isCorrect">
+        <p><strong>Ops!</strong> La risposta era errata.</p>
+        <div class="correction">
+          <p *ngIf="!isCorrectParola">
+            <ng-container *ngIf="tipoQuiz === 'ItToEs'">
+              Corretto: {{ currentVocabolo.spagnolo }}
+            </ng-container>
+            <ng-container *ngIf="tipoQuiz === 'EsToIt'">
+              Corretto: {{ currentVocabolo.italiano }}
+            </ng-container>
+          </p>
+          <ul *ngIf="!isCorrectVerbo">
+            <li>Yo {{ currentVocabolo.coniugazioni[0].yo }}</li>
+            <li>Tú {{ currentVocabolo.coniugazioni[0].tu }}</li>
+            <li>Él {{ currentVocabolo.coniugazioni[0].el }}</li>
+            <li>Nosotros {{ currentVocabolo.coniugazioni[0].nosotros }}</li>
+            <li>Vosotros {{ currentVocabolo.coniugazioni[0].vosotros }}</li>
+            <li>Ellos {{ currentVocabolo.coniugazioni[0].ellos }}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #noData>
+  <div class="empty-state">
+    <p>Il tuo vocabolario è vuoto. Aggiungi dei termini o carica un file JSON per iniziare!</p>
+  </div>
+</ng-template>
