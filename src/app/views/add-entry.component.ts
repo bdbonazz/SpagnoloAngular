@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DataService } from '../services/data.service';
 import { Vocabolo } from '../models/vocabolo.model';
@@ -11,6 +11,7 @@ import { CommonModule } from '@angular/common';
   imports: [CommonModule, ReactiveFormsModule]
 })
 export class AddEntryComponent implements OnInit {
+  @ViewChild('spagnolo') spagnoloElement!: ElementRef;
   public entryForm!: FormGroup;
   successMessage: string = '';
 
@@ -55,30 +56,32 @@ export class AddEntryComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.entryForm.valid) {
-      const formValue: any = this.entryForm.getRawValue();
-
-      const nuovoVocabolo: Vocabolo = {
-        id: Date.now(),
-        spagnolo: formValue.spagnolo,
-        italiano: formValue.italiano,
-        tipo: formValue.tipo,
-        // Salviamo la coniugazione solo se è un verbo
-        coniugazioni: [],
-      };
-      if(formValue.tipo === 'verbo')
-      {
-        nuovoVocabolo.coniugazioni.push(formValue.coniugazione);
-      }
-
-      this.dataService.addVocabolo(nuovoVocabolo);
-
-      // Reset e feedback
-      this.successMessage = 'Inserimento avvenuto con successo!';
-      this.entryForm.reset({ tipo: 'parola' });
-      this.entryForm.get('coniugazione')?.disable();
-
-      setTimeout(() => this.successMessage = '', 3000);
+    if (!this.entryForm.valid) {
+      return;
     }
+    const formValue: any = this.entryForm.getRawValue();
+
+    const nuovoVocabolo: Vocabolo = {
+      id: Date.now(),
+      spagnolo: formValue.spagnolo,
+      italiano: formValue.italiano,
+      tipo: formValue.tipo,
+      // Salviamo la coniugazione solo se è un verbo
+      coniugazioni: [],
+    };
+    if(formValue.tipo === 'verbo')
+    {
+      nuovoVocabolo.coniugazioni.push(formValue.coniugazione);
+    }
+
+    this.dataService.addVocabolo(nuovoVocabolo);
+
+    // Reset e feedback
+    this.successMessage = 'Inserimento avvenuto con successo!';
+    this.entryForm.reset({ tipo: 'parola' });
+    this.entryForm.get('coniugazione')?.disable();
+
+    this.spagnoloElement.nativeElement.focus();
+    setTimeout(() => this.successMessage = '', 3000);
   }
 }
